@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
+from random import randint
 
 db = SQLAlchemy()
 
@@ -26,6 +27,22 @@ class Character(db.Model):
     skin_color = db.Column(db.String(250), nullable=False)
     eyes_color = db.Column(db.String(250), nullable=False)
     birth_day = db.Column(db.String(250), nullable=False)
+
+    def __repr__(self):
+        return f'<Character {self.id}, {self.entry_date}>'
+
+    # def __init__(self, name):
+    #     self.name = name
+    #         .self._character = [
+    #             {
+    #                 "id" : self._generateId(),
+    #                 "name" : "name",
+    #                 "hair_color" : "hair_color",
+    #                 "skin_color" : "skin_color",
+    #                 "eyes_color" : "eyes_color",
+    #                 "birth_day" : "birth_day"
+    #             }
+    #         ]
 
     def serialize(self):
         return {
@@ -68,3 +85,26 @@ class Favorites(db.Model):
             "type": self.type,
             # do not serialize the password, its a security breach
         }
+
+def _generateId(self)
+    return randint(0, 99999999)
+
+def add_character(self, member):
+    self.user.append(member)
+    return None
+
+def delete_character(self, id):
+    status = False
+    for i, item in enumerate(self._members, start=0):
+        if item["id"] == id:
+            self._members.pop(i)
+            status = True
+    return status
+
+def get_character(self, id):
+    for i in self._members:
+        if i["id"] == int(id):
+            return i
+
+def get_all_character(self):
+    return self._members
