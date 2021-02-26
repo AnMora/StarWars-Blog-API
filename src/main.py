@@ -20,6 +20,7 @@ db.init_app(app)
 CORS(app)
 setup_admin(app)
 
+
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
@@ -34,10 +35,19 @@ def sitemap():
 def handle_hello():
 
     response_body = {
-        "msg": "Hello, this is your GET /user response "
+        "msg": "Hello, this is your GET /user/ response"
     }
 
     return jsonify(response_body), 200
+
+
+# @app.route('/character', methods=['GET'])
+# def get_character():
+
+@app.route('/user', methods=['POST'])
+def addNewUser():
+    member = jackson_family.get_member(id)
+    return jsonify(member), 200   
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
