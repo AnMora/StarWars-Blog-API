@@ -19,20 +19,22 @@ class User(db.Model):
         return {
             "id": self.id,
             "email": self.email,
+            "favorites": list(map(lambda f: f.serialize(), self.favorites)),
+            # "password": self.password,
             # do not serialize the password, its a security breach
         }
 
 class Favorites(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250), nullable=False)
-    Type = db.Column(db.Boolean, nullable=False)
+    # Type = db.Column(db.Boolean, nullable=False)
     favorites_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
     def serialize(self):
         return {
             "id": self.id,
             "name": self.name,
-            "type": self.type,
+            # "type": self.type,
             # do not serialize the password, its a security breach
         }
 

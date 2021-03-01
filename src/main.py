@@ -35,8 +35,7 @@ def sitemap():
 
 # DATOS PARA USER
 # DATOS PARA USER
-# DATOS PARA USER    
-
+# DATOS PARA USER
 @app.route('/user', methods=['GET'])
 def get_user():
     # response_body = {
@@ -74,15 +73,44 @@ def delete_user_by_id(id):
     db.session.commit()
     return("User has been deleted successfully"), 200
 
-# @app.route('/user', methods=['POST'])
-# def addNewUser():
-#     member = jackson_family.get_member(id)
-#     return jsonify(member), 200
+# DATOS PARA FAVORITES
+# DATOS PARA FAVORITES
+# DATOS PARA FAVORITES
+@app.route('/favorites', methods=['GET'])
+def get_favorites():
+    favorite = Favorites.query.all()
+    resultado = list(map(lambda x: x.serialize(),favorite))
+    return jsonify(resultado)
+
+@app.route('/favorites/<int:id>', methods=['GET'])
+def get_favorites_by_id(id):
+    favorite = Favorites.query.filter_by(id=id).first_or_404() # el first_or_404() capta en el raw el primer id y sino, imprime que no existe
+    return jsonify(favorite.serialize()) # serialize es un metodo reservado para serealizar nuestro objeto
+
+@app.route('/favorites', methods=['POST'])
+def add_favorites():
+    request_body = json.loads(request.data)
+    # if request_body["name"] == None and request_body["Type"] == None:
+    if request_body["name"] == None:
+        return "Hay datos incompletos, favor completarlos todos!"
+    else:
+        # return request_body["name"]
+        # favorite = Favorites(name=request_body["name"], Type=request_body["Type"])
+        favorite = Favorites(name=request_body["name"])
+        db.session.add(favorite)
+        db.session.commit()
+        return "Posteo exitoso"
+
+@app.route('/favorites/<int:id>', methods=['DELETE'])
+def delete_favorites_by_id(id):
+    favorite = Favorites.query.filter_by(id=id).first_or_404()
+    db.session.delete(favorite)
+    db.session.commit()
+    return("User has been deleted successfully"), 200        
 
 # DATOS DE CHARACTER
 # DATOS DE CHARACTER
 # DATOS DE CHARACTER
-
 @app.route('/character', methods=['GET'])
 def get_character():
     character = Character.query.all()
@@ -95,31 +123,30 @@ def get_character_by_id(id):
     character = Character.query.filter_by(id=id).first_or_404() # el first_or_404() capta en el raw el primer id y sino, imprime que no existe
     return jsonify(character.serialize()) # serialize es un metodo reservado para serealizar nuestro objeto
 
-@app.route('/character', methods=['POST'])
-def add_character():
-    # character = Character(name="angel", hair_color="brown", skin_color="black", eyes_color="blue", birth_day="12/12/12")
-    request_body = json.loads(request.data)# loads es para que python entienda en datos json
-    # Validar los datos recibidos
-    if request_body["name"] == None and request_body["hair_color"] == None and request_body["skin_color"] == None and request_body["eyes_color"] == None and request_body["birth_day"] == None:
-        return "Hay datos incompletos, favor completarlos todos!"
-    else:
-        # return request_body["name"]
-        character = Character(name=request_body["name"], hair_color=request_body["hair_color"], skin_color=request_body["skin_color"], eyes_color=request_body["eyes_color"], birth_day=request_body["birth_day"])
-        db.session.add(character)
-        db.session.commit()
-        return "Posteo exitoso"
+# @app.route('/character', methods=['POST'])
+# def add_character():
+#     # character = Character(name="angel", hair_color="brown", skin_color="black", eyes_color="blue", birth_day="12/12/12")
+#     request_body = json.loads(request.data)# loads es para que python entienda en datos json
+#     # Validar los datos recibidos
+#     if request_body["name"] == None and request_body["hair_color"] == None and request_body["skin_color"] == None and request_body["eyes_color"] == None and request_body["birth_day"] == None:
+#         return "Hay datos incompletos, favor completarlos todos!"
+#     else:
+#         # return request_body["name"]
+#         character = Character(name=request_body["name"], hair_color=request_body["hair_color"], skin_color=request_body["skin_color"], eyes_color=request_body["eyes_color"], birth_day=request_body["birth_day"])
+#         db.session.add(character)
+#         db.session.commit()
+#         return "Posteo exitoso"
 
-@app.route('/character/<int:id>', methods=['DELETE'])
-def delete_character_by_id(id):
-    character = Character.query.filter_by(id=id).first_or_404()
-    db.session.delete(character)
-    db.session.commit()
-    return("User has been deleted successfully"), 200
+# @app.route('/character/<int:id>', methods=['DELETE'])
+# def delete_character_by_id(id):
+#     character = Character.query.filter_by(id=id).first_or_404()
+#     db.session.delete(character)
+#     db.session.commit()
+#     return("User has been deleted successfully"), 200
 
 # DATOS DE PLANETS
 # DATOS DE PLANETS
 # DATOS DE PLANETS
-
 @app.route('/planets', methods=['GET'])
 def get_planet():
     planet = Planets.query.all()
@@ -131,29 +158,23 @@ def get_planet_by_id(id):
     planet = Planets.query.filter_by(id=id).first_or_404() # el first_or_404() capta en el raw el primer id y sino, imprime que no existe
     return jsonify(planet.serialize()) # serialize es un metodo reservado para serealizar nuestro objeto
 
-@app.route('/planets', methods=['POST'])
-def add_planet():
-    request_body = json.loads(request.data)
-    if request_body["name"] == None and request_body["rotation_period"] == None and request_body["orbital_period"] == None and request_body["terrain"] == None:
-        return "Hay datos incompletos, favor completarlos todos!"
-    else:
-        planets = Planets(name=request_body["name"], rotation_period=request_body["rotation_period"], orbital_period=request_body["orbital_period"], terrain=request_body["terrain"])
-        db.session.add(planets)
-        db.session.commit()
-        return "Posteo exitoso"
+# @app.route('/planets', methods=['POST'])
+# def add_planet():
+#     request_body = json.loads(request.data)
+#     if request_body["name"] == None and request_body["rotation_period"] == None and request_body["orbital_period"] == None and request_body["terrain"] == None:
+#         return "Hay datos incompletos, favor completarlos todos!"
+#     else:
+#         planets = Planets(name=request_body["name"], rotation_period=request_body["rotation_period"], orbital_period=request_body["orbital_period"], terrain=request_body["terrain"])
+#         db.session.add(planets)
+#         db.session.commit()
+#         return "Posteo exitoso"
 
-@app.route('/planets/<int:id>', methods=['DELETE'])
-def delete_planet_by_id(id):
-    planet = Planets.query.filter_by(id=id).first_or_404()
-    db.session.delete(planet)
-    db.session.commit()
-    return("User has been deleted successfully"), 200
-
-# DATOS DE FAVORITES
-# DATOS DE FAVORITES
-# DATOS DE FAVORITES
-
-
+# @app.route('/planets/<int:id>', methods=['DELETE'])
+# def delete_planet_by_id(id):
+#     planet = Planets.query.filter_by(id=id).first_or_404()
+#     db.session.delete(planet)
+#     db.session.commit()
+#     return("User has been deleted successfully"), 200
 
 # Continuar con el integrar funcion de favoritos y delete para eliminar de favoritos
 
