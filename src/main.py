@@ -106,7 +106,7 @@ def delete_favorites_by_id(id):
     favorite = Favorites.query.filter_by(id=id).first_or_404()
     db.session.delete(favorite)
     db.session.commit()
-    return("User has been deleted successfully"), 200        
+    return("User has been deleted successfully"), 200
 
 # DATOS DE CHARACTER
 # DATOS DE CHARACTER
@@ -176,7 +176,22 @@ def get_planet_by_id(id):
 #     db.session.commit()
 #     return("User has been deleted successfully"), 200
 
-# Continuar con el integrar funcion de favoritos y delete para eliminar de favoritos
+# DATOS DE LOGIN AND REGISTER
+# DATOS DE LOGIN AND REGISTER
+# DATOS DE LOGIN AND REGISTER
+# @app.route('/login', methods=['POST'])
+# def login_or_register():
+#     request_body = json.loads(request.data)
+#     # if request_body["name"] == None and request_body["Type"] == None:
+#     if request_body["name"] == None:
+#         return "Hay datos incompletos, favor completarlos todos!"
+#     else:
+#         # return request_body["name"]
+#         # favorite = Favorites(name=request_body["name"], Type=request_body["Type"])
+#         favorite = Favorites(name=request_body["name"])
+#         db.session.add(favorite)
+#         db.session.commit()
+#         return "Posteo exitoso"
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
