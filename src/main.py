@@ -9,7 +9,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Character, Planets, Favorites
+from models import db, User, Favorites, Character, Planets, Vehicles
 #from models import Person
 
 app = Flask(__name__)
@@ -175,6 +175,20 @@ def get_planet_by_id(id):
 #     db.session.delete(planet)
 #     db.session.commit()
 #     return("User has been deleted successfully"), 200
+
+# DATOS DE CHARACTER
+# DATOS DE CHARACTER
+# DATOS DE CHARACTER
+@app.route('/vehicles', methods=['GET'])
+def get_vehicle():
+    vehicle = Vehicles.query.all()
+    resultado = list(map(lambda x: x.serialize(), vehicle))
+    return jsonify(resultado)
+
+@app.route('/vehicles/<int:id>', methods=['GET'])
+def get_vehicle_by_id(id):
+    vehicle = Vehicles.query.filter_by(id=id).first_or_404() # el first_or_404() capta en el raw el primer id y sino, imprime que no existe
+    return jsonify(vehicle.serialize()) # serialize es un metodo reservado para serealizar nuestro objeto
 
 # DATOS DE LOGIN AND REGISTER
 # DATOS DE LOGIN AND REGISTER

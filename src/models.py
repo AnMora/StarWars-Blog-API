@@ -45,6 +45,7 @@ class Character(db.Model):
     skin_color = db.Column(db.String(250), nullable=False)
     eyes_color = db.Column(db.String(250), nullable=False)
     birth_day = db.Column(db.String(250), nullable=False)
+    # img_character = db.Column(db.String())
 
     # def __repr__(self):
     #     return f'<Character {self.id}, {self.entry_date}>'
@@ -57,6 +58,7 @@ class Character(db.Model):
             "skin_color": self.skin_color,
             "eyes_color": self.eyes_color,
             "birth_day": self.birth_day,
+            # "img_character": self.img_character
             # do not serialize the password, its a security breach
         }
 
@@ -75,4 +77,20 @@ class Planets(db.Model):
             "orbital_period": self.orbital_period,
             "terrain": self.terrain,
             # do not serialize the password, its a security breach
+        }
+
+class Vehicles(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250), nullable=False)
+    model = db.Column(db.String(250), nullable=False)
+    cost_in_credits = db.Column(db.String(250), nullable=False)
+    max_atmosphering_speed = db.Column(db.String(250), nullable=False)
+
+    def serialize(self):
+        return{
+            "id": self.id,
+            "name": self.name,
+            "model": self.model,
+            "cost_in_credits": self.cost_in_credits,
+            "max_atmosphering_speed": self.max_atmosphering_speed
         }
