@@ -4,13 +4,25 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 import os
 from flask import Flask, request, jsonify, url_for
 import json
+import datetime
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
 from models import db, User, Favorites, Character, Planets, Vehicles
+
 #from models import Person
+
+# ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+## Nos permite hacer las encripciones de contraseñas
+from werkzeug.security import generate_password_hash, check_password_hash
+
+## Nos permite manejar tokens por authentication (usuarios) 
+# from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+
+# ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -61,10 +73,25 @@ def add_user():
         return "Hay datos incompletos, favor completarlos todos!"
     else:
         # return request_body["name"]
-        user = Character(name=request_body["name"], email=request_body["email"], password=request_body["password"])
+        user = User(name=request_body["name"], email=request_body["email"], password=request_body["password"])
         db.session.add(user)
         db.session.commit()
         return "Posteo exitoso"
+
+@app.route('/user/<int:id>', methods=['PUT'])
+def update_user():
+    user = User.query.get(id)
+    if user is None:
+        raise APIException('User not found', status_code=404)
+
+    request_body = request.get_json()
+
+    if "name" in request_body:
+        user.name = request_body["name"]
+
+    db.session.commit()
+
+    return jsonify("All good"), 200
 
 @app.route('/user/<int:id>', methods=['DELETE'])
 def delete_user_by_id(id):
@@ -100,6 +127,21 @@ def add_favorites():
         db.session.add(favorite)
         db.session.commit()
         return "Posteo exitoso"
+
+@app.route('/favorites/<int:id>', methods=['PUT'])
+def update_favorites(id):
+    favorite = Favorites.query.get(id)
+    if favorite is None:
+        raise APIException('Favorites not found', status_code=404)
+
+    request_body = request.get_json()
+
+    if "name" in request_body:
+        favorite = request_body["name"]
+
+    db.session.commit()
+
+    return jsonify("All good"), 200
 
 @app.route('/favorites/<int:id>', methods=['DELETE'])
 def delete_favorites_by_id(id):
@@ -158,24 +200,6 @@ def get_planet_by_id(id):
     planet = Planets.query.filter_by(id=id).first_or_404() # el first_or_404() capta en el raw el primer id y sino, imprime que no existe
     return jsonify(planet.serialize()) # serialize es un metodo reservado para serealizar nuestro objeto
 
-# @app.route('/planets', methods=['POST'])
-# def add_planet():
-#     request_body = json.loads(request.data)
-#     if request_body["name"] == None and request_body["rotation_period"] == None and request_body["orbital_period"] == None and request_body["terrain"] == None:
-#         return "Hay datos incompletos, favor completarlos todos!"
-#     else:
-#         planets = Planets(name=request_body["name"], rotation_period=request_body["rotation_period"], orbital_period=request_body["orbital_period"], terrain=request_body["terrain"])
-#         db.session.add(planets)
-#         db.session.commit()
-#         return "Posteo exitoso"
-
-# @app.route('/planets/<int:id>', methods=['DELETE'])
-# def delete_planet_by_id(id):
-#     planet = Planets.query.filter_by(id=id).first_or_404()
-#     db.session.delete(planet)
-#     db.session.commit()
-#     return("User has been deleted successfully"), 200
-
 # DATOS DE CHARACTER
 # DATOS DE CHARACTER
 # DATOS DE CHARACTER
@@ -190,22 +214,44 @@ def get_vehicle_by_id(id):
     vehicle = Vehicles.query.filter_by(id=id).first_or_404() # el first_or_404() capta en el raw el primer id y sino, imprime que no existe
     return jsonify(vehicle.serialize()) # serialize es un metodo reservado para serealizar nuestro objeto
 
-# DATOS DE LOGIN AND REGISTER
-# DATOS DE LOGIN AND REGISTER
-# DATOS DE LOGIN AND REGISTER
-# @app.route('/login', methods=['POST'])
-# def login_or_register():
-#     request_body = json.loads(request.data)
-#     # if request_body["name"] == None and request_body["Type"] == None:
-#     if request_body["name"] == None:
-#         return "Hay datos incompletos, favor completarlos todos!"
-#     else:
-#         # return request_body["name"]
-#         # favorite = Favorites(name=request_body["name"], Type=request_body["Type"])
-#         favorite = Favorites(name=request_body["name"])
-#         db.session.add(favorite)
-#         db.session.commit()
-#         return "Posteo exitoso"
+# DATOS DE REGISTER
+# DATOS DE REGISTER
+# DATOS DE REGISTER
+@app.route('/register', methods=['POST'])
+def register():
+    if request.method == "POST":
+        email = request.json.get("email", None)
+        password = request.json.get("password", None)
+
+        if not email:
+            return jsonify({
+                "msg": "email is required"
+            }), 400
+        if not password:
+            return jsonify({
+                "msg": "password is required"
+            }), 400
+
+        user = User.query.filter_by(email=email).first()
+        if user:
+            return jsonify({
+                "msg": "Username already exists"
+            }), 400
+
+        user = User()
+        user.email = email
+        hashed_password = generate_password_hash(password)
+        print(password, hashed_password)
+
+        user.password = hashed_password
+
+        db.session.add(user)
+        db.session.commit()
+
+        return jsonify({
+            "success": "thanks. your register was successfully", "status": "True"
+        }), 200
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
