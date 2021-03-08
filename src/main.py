@@ -289,7 +289,8 @@ def login():
         data = {
             "user": user.serialize(),
             "token": access_token,
-            "expires": expiracion.total_seconds()*1000
+            "expires": expiracion.total_seconds()*1000,
+            "status": True
         }
 
         return jsonify(data), 200
